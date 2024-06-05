@@ -6,14 +6,17 @@ display.set_caption('Pong')
 background = transform.scale(image.load('Mortal_Kombat.jpg'), (700, 500))
 FPS = 360
 
+mixer.init()
+mixer.music.load('Epic.ogg')
+mixer.music.play()
+mixer.music.set_volume(0.5)
+
 font.init()
-font1 = font.SysFont('Arial', 25)
-scored = font1.render('Score', True, (255,255,255))
-missed = font1.render('Missed', True, (255,255,255))
 
 font2 = font.SysFont('Arial', 70)
-win = font2.render('YOU WIN', True, (0,255,0))
-lose = font2.render('YOU LOSE', True, (255,0,0))
+
+player_1 = font2.render('Left Player WINS', True, (0,255,0))
+player_2 = font2.render('Right Player WINS', True, (0,255,0))
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, player_x, player_y, player_speed, win_width, win_height):
@@ -41,8 +44,8 @@ class Player(GameSprite):
         if keys[K_s] and self.rect.y < 395:
             self.rect.y += self.speed
 
-racket_left = Player('bamboo_1.png', 600, 200, 10, 100, 100)
-racket_right = Player('bamboo.png', 0, 200, 10, 100, 100)
+racket_left = Player('bamboo_1.png', 600, 200, 10, 50, 100)
+racket_right = Player('bamboo.png', 0, 200, 10, 50, 100)
 bomb = Player('dynamite.png', 325, 200, 10, 50, 50)
 
 dx = 4
@@ -75,10 +78,25 @@ while game:
         if bomb.rect.y < 0:
             dy *= -1
 
-        if bomb.rect.x > 600:
-            bomb.rect.center
-            dy *= -1
+        if sprite.collide_rect(racket_right, bomb) or sprite.collide_rect(racket_left, bomb):
+            dx *= -1
+
+        if bomb.rect.x > 700:
+            finish = True
+            window.blit(player_1, (125,200))
         
+        if bomb.rect.x < 0:
+            finish = True
+            window.blit(player_2, (125,200))
+        
+    else:
+        finish = False
+
+        bomb.rect.x = 325
+        bomb.rect.y = 200
+
+        time.delay(5000)
+
 
     display.update()
     time.delay(50)
